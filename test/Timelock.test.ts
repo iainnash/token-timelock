@@ -1,6 +1,6 @@
 import { ContractReceipt, Event } from '@ethersproject/contracts';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/dist/src/signers';
-import chai, { expect } from 'chai';
+import { expect } from 'chai';
 import { ethers, deployments, network } from 'hardhat';
 
 import { TestToken, Timelock, TimelockCreator } from '../typechain';
@@ -104,6 +104,40 @@ describe('TimelockTest', () => {
         ethers.utils.parseEther('1')
       );
       expect(await testToken.balanceOf(await s3.getAddress())).to.be.equal(
+        ethers.utils.parseEther('1')
+      );
+      await network.provider.request({
+        method: 'evm_increaseTime',
+        params: [60 * 60 * 24 * 4 + 1],
+      });
+      const lastBalance = await testToken.balanceOf(signerAddress);
+      await tmLock.recover();
+      expect(await testToken.balanceOf(signerAddress)).to.be.equal(lastBalance);
+    });
+
+    it('allows adding on new grants', async () => {
+      const [s1, s2, s3] = await ethers.getSigners();
+      await testToken.mint(ethers.utils.parseEther('100'));
+      await testToken.approve(tmLock.address, ethers.utils.parseEther('100'));
+      await tmLock.addGrants([
+        await s1.getAddress(),
+      ]);
+      await tmLock.addGrants([
+        await s2.getAddress(),
+      ]);
+      await network.provider.request({
+        method: 'evm_increaseTime',
+        params: [60 * 60 * 24 * 2 + 1],
+      });
+      const signerBeforeClaimBalance = await testToken.balanceOf(signerAddress);
+      await tmLock.connect(s1).claim();
+      await tmLock.connect(s2).claim();
+      expect(
+        await (
+          await testToken.balanceOf(signerAddress)
+        ).sub(signerBeforeClaimBalance)
+      ).to.be.equal(ethers.utils.parseEther('1'));
+      expect(await testToken.balanceOf(await s2.getAddress())).to.be.equal(
         ethers.utils.parseEther('1')
       );
       await network.provider.request({
