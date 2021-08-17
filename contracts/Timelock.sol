@@ -1,17 +1,43 @@
+// SPDX-License-Identifier: GPL-3.0
+
 pragma solidity 0.8.6;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "hardhat/console.sol";
 
+/**
+Error codes:
+a5: Cannot set the recovery grant before the unlock time
+a3: Only owner can add grants.
+a2: Grant not valid.
+a7: Too early to claim
+a4: Only owner can recover
+a6: Too early to recover
+a9: Already granted
+ */
+
+/**
+  Timelock contract.
+  Fixed token payout and timing.
+  Can add recipients and multiple grants per recipient.
+ */
 contract Timelock {
     IERC20 private token;
     uint256 private tokenAmount;
     uint256 public timeRecoverGrant;
     uint256 public timeReceiveGrant;
     address private owner;
-    address[] public recipients;
-    bool[] public hasClaimed;
+    // address[] public recipients;
+    // bool[] public hasClaimed;
+    enum GrantStatus {
+        UNKNOWN,
+        GRANTED,
+        CLAIMED,
+        RECOVERED
+    }
+    mapping (address => GrantStatus) grants;
 
-    event Recovered(address sender, uint256 amount);
+    event Recovered(address sender, address recipient);
     event Claimed(address actor, address claimee);
 
     constructor(
@@ -43,64 +69,33 @@ contract Timelock {
             tokenAmount * numberRecipients
         );
         for (uint256 i = 0; i < numberRecipients; i++) {
-            recipients.push(newRecipients[i]);
-            hasClaimed.push(false);
+            require(grants[newRecipients[i]] == GrantStatus.UNKNOWN, "a9");
+            grants[newRecipients[i]] = GrantStatus.GRANTED;
         }
     }
 
-    function lockedBalanceOf(address recipient)
+    function grantStatus(address recipient)
         external
         view
-        returns (uint256)
+        returns (GrantStatus)
     {
-        uint256 balance = 0;
-        for (uint256 i = 0; i < recipients.length; i++) {
-            if (recipients[i] == recipient && !hasClaimed[i]) {
-                balance += tokenAmount;
-            }
-        }
-        return balance;
+        return grants[recipient];
     }
 
-    function claimedBalanceOf(address recipient)
-        external
-        view
-        returns (uint256)
-    {
-        uint256 balance = 0;
-        for (uint256 i = 0; i < recipients.length; i++) {
-            if (recipients[i] == recipient && hasClaimed[i]) {
-                balance += tokenAmount;
-            }
-        }
-        return balance;
-    }
-
-    function claim(address recipient) external {
+    function claim() external {
+        address recipient = msg.sender;
         require(block.timestamp > timeReceiveGrant, "a7");
-        bool success = false;
-        for (uint256 i = 0; i < recipients.length; i++) {
-            if (recipients[i] == recipient) {
-                require(!hasClaimed[i], "a2");
-                token.transfer(recipient, tokenAmount);
-                hasClaimed[i] = true;
-                emit Claimed(msg.sender, recipient);
-                success = true;
-            }
-        }
-        require(success, "no recipients found");
+        require(grants[recipient] == GrantStatus.GRANTED, "a2");
+        token.transfer(recipient, tokenAmount);
+        grants[recipient] = GrantStatus.CLAIMED;
+        emit Claimed(msg.sender, recipient);
     }
 
-    function recover() external {
-        require(msg.sender == owner, "a3");
-        require(block.timestamp > timeRecoverGrant, "a4");
-        uint256 amount = token.balanceOf(address(this));
-        emit Recovered(msg.sender, amount);
-
-        for (uint256 i = 0; i < hasClaimed.length; i++) {
-            hasClaimed[i] = true;
-        }
-        // Recovers remaining token balance.
-        token.transfer(owner, amount);
+    function recover(address recipient) external {
+        require(msg.sender == owner, "a4");
+        require(block.timestamp > timeRecoverGrant, "a6");
+        grants[recipient] = GrantStatus.RECOVERED;
+        emit Recovered(msg.sender, recipient);
+        token.transfer(owner, tokenAmount);
     }
 }

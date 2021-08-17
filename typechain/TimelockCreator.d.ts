@@ -22,12 +22,12 @@ import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 
 interface TimelockCreatorInterface extends ethers.utils.Interface {
   functions: {
-    "createTimelock(address,uint256,uint16,uint16)": FunctionFragment;
+    "createTimelock(address,address,uint256,uint16,uint16)": FunctionFragment;
   };
 
   encodeFunctionData(
     functionFragment: "createTimelock",
-    values: [string, BigNumberish, BigNumberish, BigNumberish]
+    values: [string, string, BigNumberish, BigNumberish, BigNumberish]
   ): string;
 
   decodeFunctionResult(
@@ -57,6 +57,7 @@ export class TimelockCreator extends Contract {
 
   functions: {
     createTimelock(
+      owner: string,
       token: string,
       payoutAmount: BigNumberish,
       daysInFuture: BigNumberish,
@@ -64,7 +65,8 @@ export class TimelockCreator extends Contract {
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    "createTimelock(address,uint256,uint16,uint16)"(
+    "createTimelock(address,address,uint256,uint16,uint16)"(
+      owner: string,
       token: string,
       payoutAmount: BigNumberish,
       daysInFuture: BigNumberish,
@@ -74,6 +76,7 @@ export class TimelockCreator extends Contract {
   };
 
   createTimelock(
+    owner: string,
     token: string,
     payoutAmount: BigNumberish,
     daysInFuture: BigNumberish,
@@ -81,7 +84,8 @@ export class TimelockCreator extends Contract {
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  "createTimelock(address,uint256,uint16,uint16)"(
+  "createTimelock(address,address,uint256,uint16,uint16)"(
+    owner: string,
     token: string,
     payoutAmount: BigNumberish,
     daysInFuture: BigNumberish,
@@ -91,6 +95,7 @@ export class TimelockCreator extends Contract {
 
   callStatic: {
     createTimelock(
+      owner: string,
       token: string,
       payoutAmount: BigNumberish,
       daysInFuture: BigNumberish,
@@ -98,7 +103,8 @@ export class TimelockCreator extends Contract {
       overrides?: CallOverrides
     ): Promise<string>;
 
-    "createTimelock(address,uint256,uint16,uint16)"(
+    "createTimelock(address,address,uint256,uint16,uint16)"(
+      owner: string,
       token: string,
       payoutAmount: BigNumberish,
       daysInFuture: BigNumberish,
@@ -116,6 +122,7 @@ export class TimelockCreator extends Contract {
 
   estimateGas: {
     createTimelock(
+      owner: string,
       token: string,
       payoutAmount: BigNumberish,
       daysInFuture: BigNumberish,
@@ -123,7 +130,8 @@ export class TimelockCreator extends Contract {
       overrides?: Overrides
     ): Promise<BigNumber>;
 
-    "createTimelock(address,uint256,uint16,uint16)"(
+    "createTimelock(address,address,uint256,uint16,uint16)"(
+      owner: string,
       token: string,
       payoutAmount: BigNumberish,
       daysInFuture: BigNumberish,
@@ -134,6 +142,7 @@ export class TimelockCreator extends Contract {
 
   populateTransaction: {
     createTimelock(
+      owner: string,
       token: string,
       payoutAmount: BigNumberish,
       daysInFuture: BigNumberish,
@@ -141,7 +150,8 @@ export class TimelockCreator extends Contract {
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
-    "createTimelock(address,uint256,uint16,uint16)"(
+    "createTimelock(address,address,uint256,uint16,uint16)"(
+      owner: string,
       token: string,
       payoutAmount: BigNumberish,
       daysInFuture: BigNumberish,

@@ -6,13 +6,14 @@ contract TimelockCreator {
     event CreatedTimelockContract(address indexed, Timelock);
 
     function createTimelock(
+        address owner,
         IERC20 token,
         uint256 payoutAmount,
         uint16 daysInFuture,
         uint16 recoveryDaysAfterGrant
     ) external returns (Timelock) {
-        Timelock response = new Timelock(msg.sender, token, payoutAmount, daysInFuture, recoveryDaysAfterGrant);
-        emit CreatedTimelockContract(msg.sender, response);
+        Timelock response = new Timelock(owner, token, payoutAmount, daysInFuture, recoveryDaysAfterGrant);
+        emit CreatedTimelockContract(owner, response);
         return response;
     }
 }
