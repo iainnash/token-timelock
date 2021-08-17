@@ -23,8 +23,10 @@ import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 interface TimelockInterface extends ethers.utils.Interface {
   functions: {
     "addGrants(address[])": FunctionFragment;
-    "claim()": FunctionFragment;
+    "claim(address)": FunctionFragment;
+    "claimedBalanceOf(address)": FunctionFragment;
     "hasClaimed(uint256)": FunctionFragment;
+    "lockedBalanceOf(address)": FunctionFragment;
     "recipients(uint256)": FunctionFragment;
     "recover()": FunctionFragment;
     "timeReceiveGrant()": FunctionFragment;
@@ -32,10 +34,18 @@ interface TimelockInterface extends ethers.utils.Interface {
   };
 
   encodeFunctionData(functionFragment: "addGrants", values: [string[]]): string;
-  encodeFunctionData(functionFragment: "claim", values?: undefined): string;
+  encodeFunctionData(functionFragment: "claim", values: [string]): string;
+  encodeFunctionData(
+    functionFragment: "claimedBalanceOf",
+    values: [string]
+  ): string;
   encodeFunctionData(
     functionFragment: "hasClaimed",
     values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "lockedBalanceOf",
+    values: [string]
   ): string;
   encodeFunctionData(
     functionFragment: "recipients",
@@ -53,7 +63,15 @@ interface TimelockInterface extends ethers.utils.Interface {
 
   decodeFunctionResult(functionFragment: "addGrants", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "claim", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "claimedBalanceOf",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "hasClaimed", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "lockedBalanceOf",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "recipients", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "recover", data: BytesLike): Result;
   decodeFunctionResult(
@@ -66,7 +84,7 @@ interface TimelockInterface extends ethers.utils.Interface {
   ): Result;
 
   events: {
-    "Claimed(address)": EventFragment;
+    "Claimed(address,address)": EventFragment;
     "Recovered(address,uint256)": EventFragment;
   };
 
@@ -98,9 +116,29 @@ export class Timelock extends Contract {
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    claim(overrides?: Overrides): Promise<ContractTransaction>;
+    claim(
+      recipient: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
 
-    "claim()"(overrides?: Overrides): Promise<ContractTransaction>;
+    "claim(address)"(
+      recipient: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    claimedBalanceOf(
+      recipient: string,
+      overrides?: CallOverrides
+    ): Promise<{
+      0: BigNumber;
+    }>;
+
+    "claimedBalanceOf(address)"(
+      recipient: string,
+      overrides?: CallOverrides
+    ): Promise<{
+      0: BigNumber;
+    }>;
 
     hasClaimed(
       arg0: BigNumberish,
@@ -114,6 +152,20 @@ export class Timelock extends Contract {
       overrides?: CallOverrides
     ): Promise<{
       0: boolean;
+    }>;
+
+    lockedBalanceOf(
+      recipient: string,
+      overrides?: CallOverrides
+    ): Promise<{
+      0: BigNumber;
+    }>;
+
+    "lockedBalanceOf(address)"(
+      recipient: string,
+      overrides?: CallOverrides
+    ): Promise<{
+      0: BigNumber;
     }>;
 
     recipients(
@@ -161,9 +213,22 @@ export class Timelock extends Contract {
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  claim(overrides?: Overrides): Promise<ContractTransaction>;
+  claim(recipient: string, overrides?: Overrides): Promise<ContractTransaction>;
 
-  "claim()"(overrides?: Overrides): Promise<ContractTransaction>;
+  "claim(address)"(
+    recipient: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  claimedBalanceOf(
+    recipient: string,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  "claimedBalanceOf(address)"(
+    recipient: string,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
 
   hasClaimed(arg0: BigNumberish, overrides?: CallOverrides): Promise<boolean>;
 
@@ -171,6 +236,16 @@ export class Timelock extends Contract {
     arg0: BigNumberish,
     overrides?: CallOverrides
   ): Promise<boolean>;
+
+  lockedBalanceOf(
+    recipient: string,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  "lockedBalanceOf(address)"(
+    recipient: string,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
 
   recipients(arg0: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
@@ -202,9 +277,22 @@ export class Timelock extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    claim(overrides?: CallOverrides): Promise<void>;
+    claim(recipient: string, overrides?: CallOverrides): Promise<void>;
 
-    "claim()"(overrides?: CallOverrides): Promise<void>;
+    "claim(address)"(
+      recipient: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    claimedBalanceOf(
+      recipient: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "claimedBalanceOf(address)"(
+      recipient: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     hasClaimed(arg0: BigNumberish, overrides?: CallOverrides): Promise<boolean>;
 
@@ -212,6 +300,16 @@ export class Timelock extends Contract {
       arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<boolean>;
+
+    lockedBalanceOf(
+      recipient: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "lockedBalanceOf(address)"(
+      recipient: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     recipients(arg0: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
@@ -234,7 +332,7 @@ export class Timelock extends Contract {
   };
 
   filters: {
-    Claimed(claimee: null): EventFilter;
+    Claimed(actor: null, claimee: null): EventFilter;
 
     Recovered(sender: null, amount: null): EventFilter;
   };
@@ -250,9 +348,22 @@ export class Timelock extends Contract {
       overrides?: Overrides
     ): Promise<BigNumber>;
 
-    claim(overrides?: Overrides): Promise<BigNumber>;
+    claim(recipient: string, overrides?: Overrides): Promise<BigNumber>;
 
-    "claim()"(overrides?: Overrides): Promise<BigNumber>;
+    "claim(address)"(
+      recipient: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    claimedBalanceOf(
+      recipient: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "claimedBalanceOf(address)"(
+      recipient: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     hasClaimed(
       arg0: BigNumberish,
@@ -261,6 +372,16 @@ export class Timelock extends Contract {
 
     "hasClaimed(uint256)"(
       arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    lockedBalanceOf(
+      recipient: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "lockedBalanceOf(address)"(
+      recipient: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -298,9 +419,25 @@ export class Timelock extends Contract {
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
-    claim(overrides?: Overrides): Promise<PopulatedTransaction>;
+    claim(
+      recipient: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
 
-    "claim()"(overrides?: Overrides): Promise<PopulatedTransaction>;
+    "claim(address)"(
+      recipient: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    claimedBalanceOf(
+      recipient: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "claimedBalanceOf(address)"(
+      recipient: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
     hasClaimed(
       arg0: BigNumberish,
@@ -309,6 +446,16 @@ export class Timelock extends Contract {
 
     "hasClaimed(uint256)"(
       arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    lockedBalanceOf(
+      recipient: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "lockedBalanceOf(address)"(
+      recipient: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

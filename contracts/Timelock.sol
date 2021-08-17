@@ -1,7 +1,6 @@
 pragma solidity 0.8.6;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/access/AccessControl.sol";
 
 contract Timelock {
     IERC20 private token;
@@ -13,7 +12,7 @@ contract Timelock {
     bool[] public hasClaimed;
 
     event Recovered(address sender, uint256 amount);
-    event Claimed(address claimee);
+    event Claimed(address actor, address claimee);
 
     constructor(
         address _owner,
@@ -49,18 +48,47 @@ contract Timelock {
         }
     }
 
-    function claim() external {
-        require(block.timestamp > timeReceiveGrant, "a7");
+    function lockedBalanceOf(address recipient)
+        external
+        view
+        returns (uint256)
+    {
+        uint256 balance = 0;
         for (uint256 i = 0; i < recipients.length; i++) {
-            if (recipients[i] == msg.sender) {
-                require(!hasClaimed[i], "a2");
-                token.transfer(msg.sender, tokenAmount);
-                hasClaimed[i] = true;
-                emit Claimed(msg.sender);
-                return;
+            if (recipients[i] == recipient && !hasClaimed[i]) {
+                balance += tokenAmount;
             }
         }
-        revert("a3");
+        return balance;
+    }
+
+    function claimedBalanceOf(address recipient)
+        external
+        view
+        returns (uint256)
+    {
+        uint256 balance = 0;
+        for (uint256 i = 0; i < recipients.length; i++) {
+            if (recipients[i] == recipient && hasClaimed[i]) {
+                balance += tokenAmount;
+            }
+        }
+        return balance;
+    }
+
+    function claim(address recipient) external {
+        require(block.timestamp > timeReceiveGrant, "a7");
+        bool success = false;
+        for (uint256 i = 0; i < recipients.length; i++) {
+            if (recipients[i] == recipient) {
+                require(!hasClaimed[i], "a2");
+                token.transfer(recipient, tokenAmount);
+                hasClaimed[i] = true;
+                emit Claimed(msg.sender, recipient);
+                success = true;
+            }
+        }
+        require(success, "no recipients found");
     }
 
     function recover() external {

@@ -1,6 +1,5 @@
 pragma solidity 0.8.6;
 
-import "@openzeppelin/contracts/access/AccessControl.sol";
 import "./Timelock.sol";
 
 contract TimelockCreator {
