@@ -14,6 +14,7 @@ a7: Too early to claim
 a4: Only owner can recover
 a6: Too early to recover
 a9: Already granted
+a1: Recover and recieve grant days need to be greater than 0
  */
 
 /**
@@ -27,18 +28,29 @@ contract Timelock {
     uint256 public timeRecoverGrant;
     uint256 public timeReceiveGrant;
     address private owner;
-    // address[] public recipients;
-    // bool[] public hasClaimed;
+
     enum GrantStatus {
+        // No grant setup for user
         UNKNOWN,
+        // Granted to user
         GRANTED,
+        // Claimed by user
         CLAIMED,
+        // Recovered by admin
         RECOVERED
     }
-    mapping (address => GrantStatus) grants;
 
+    // Mapping of address to grant
+    mapping(address => GrantStatus) grants;
+
+    // Emitted when a claim is recovered
     event Recovered(address sender, address recipient);
+
+    // Emitted when a claim is claimed
     event Claimed(address actor, address claimee);
+
+    // Emitted when a grant is added
+    event GrantsAdded(address actor, address[] newRecipients);
 
     constructor(
         address _owner,
@@ -50,13 +62,12 @@ contract Timelock {
         token = _token;
         owner = _owner;
         tokenAmount = _tokenAmount;
+        require(daysGrant > 0, "a1");
+        require(daysRecover > 0, "a1");
         timeReceiveGrant = (uint256(daysGrant) * 1 days) + block.timestamp;
-        timeRecoverGrant = 0;
-        if (daysRecover > 0) {
-            timeRecoverGrant =
-                (uint256(daysGrant + daysRecover) * 1 days) +
-                block.timestamp;
-        }
+        timeRecoverGrant =
+            (uint256(daysGrant + daysRecover) * 1 days) +
+            block.timestamp;
         require(timeReceiveGrant < timeRecoverGrant, "a5");
     }
 
@@ -72,6 +83,7 @@ contract Timelock {
             require(grants[newRecipients[i]] == GrantStatus.UNKNOWN, "a9");
             grants[newRecipients[i]] = GrantStatus.GRANTED;
         }
+        emit GrantsAdded(owner, newRecipients);
     }
 
     function grantStatus(address recipient)

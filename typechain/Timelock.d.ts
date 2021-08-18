@@ -61,10 +61,12 @@ interface TimelockInterface extends ethers.utils.Interface {
 
   events: {
     "Claimed(address,address)": EventFragment;
+    "GrantsAdded(address,address[])": EventFragment;
     "Recovered(address,address)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "Claimed"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "GrantsAdded"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Recovered"): EventFragment;
 }
 
@@ -216,6 +218,8 @@ export class Timelock extends Contract {
 
   filters: {
     Claimed(actor: null, claimee: null): EventFilter;
+
+    GrantsAdded(actor: null, newRecipients: null): EventFilter;
 
     Recovered(sender: null, recipient: null): EventFilter;
   };
