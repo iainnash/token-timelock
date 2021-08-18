@@ -24,6 +24,8 @@ interface TimelockInterface extends ethers.utils.Interface {
   functions: {
     "addGrants(address[])": FunctionFragment;
     "claim()": FunctionFragment;
+    "getTimeUnlock()": FunctionFragment;
+    "getTokenAndAmount()": FunctionFragment;
     "grantStatus(address)": FunctionFragment;
     "recover(address)": FunctionFragment;
     "timeReceiveGrant()": FunctionFragment;
@@ -32,6 +34,14 @@ interface TimelockInterface extends ethers.utils.Interface {
 
   encodeFunctionData(functionFragment: "addGrants", values: [string[]]): string;
   encodeFunctionData(functionFragment: "claim", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "getTimeUnlock",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getTokenAndAmount",
+    values?: undefined
+  ): string;
   encodeFunctionData(functionFragment: "grantStatus", values: [string]): string;
   encodeFunctionData(functionFragment: "recover", values: [string]): string;
   encodeFunctionData(
@@ -45,6 +55,14 @@ interface TimelockInterface extends ethers.utils.Interface {
 
   decodeFunctionResult(functionFragment: "addGrants", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "claim", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "getTimeUnlock",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getTokenAndAmount",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "grantStatus",
     data: BytesLike
@@ -60,7 +78,7 @@ interface TimelockInterface extends ethers.utils.Interface {
   ): Result;
 
   events: {
-    "Claimed(address,address)": EventFragment;
+    "Claimed(address,uint256)": EventFragment;
     "GrantsAdded(address,address[])": EventFragment;
     "Recovered(address,address)": EventFragment;
   };
@@ -97,6 +115,24 @@ export class Timelock extends Contract {
     claim(overrides?: Overrides): Promise<ContractTransaction>;
 
     "claim()"(overrides?: Overrides): Promise<ContractTransaction>;
+
+    getTimeUnlock(overrides?: CallOverrides): Promise<{
+      0: BigNumber;
+    }>;
+
+    "getTimeUnlock()"(overrides?: CallOverrides): Promise<{
+      0: BigNumber;
+    }>;
+
+    getTokenAndAmount(overrides?: CallOverrides): Promise<{
+      0: string;
+      1: BigNumber;
+    }>;
+
+    "getTokenAndAmount()"(overrides?: CallOverrides): Promise<{
+      0: string;
+      1: BigNumber;
+    }>;
 
     grantStatus(
       recipient: string,
@@ -153,6 +189,20 @@ export class Timelock extends Contract {
 
   "claim()"(overrides?: Overrides): Promise<ContractTransaction>;
 
+  getTimeUnlock(overrides?: CallOverrides): Promise<BigNumber>;
+
+  "getTimeUnlock()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+  getTokenAndAmount(overrides?: CallOverrides): Promise<{
+    0: string;
+    1: BigNumber;
+  }>;
+
+  "getTokenAndAmount()"(overrides?: CallOverrides): Promise<{
+    0: string;
+    1: BigNumber;
+  }>;
+
   grantStatus(recipient: string, overrides?: CallOverrides): Promise<number>;
 
   "grantStatus(address)"(
@@ -193,6 +243,20 @@ export class Timelock extends Contract {
 
     "claim()"(overrides?: CallOverrides): Promise<void>;
 
+    getTimeUnlock(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "getTimeUnlock()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    getTokenAndAmount(overrides?: CallOverrides): Promise<{
+      0: string;
+      1: BigNumber;
+    }>;
+
+    "getTokenAndAmount()"(overrides?: CallOverrides): Promise<{
+      0: string;
+      1: BigNumber;
+    }>;
+
     grantStatus(recipient: string, overrides?: CallOverrides): Promise<number>;
 
     "grantStatus(address)"(
@@ -217,7 +281,7 @@ export class Timelock extends Contract {
   };
 
   filters: {
-    Claimed(actor: null, claimee: null): EventFilter;
+    Claimed(actor: null, amount: null): EventFilter;
 
     GrantsAdded(actor: null, newRecipients: null): EventFilter;
 
@@ -238,6 +302,14 @@ export class Timelock extends Contract {
     claim(overrides?: Overrides): Promise<BigNumber>;
 
     "claim()"(overrides?: Overrides): Promise<BigNumber>;
+
+    getTimeUnlock(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "getTimeUnlock()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    getTokenAndAmount(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "getTokenAndAmount()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     grantStatus(
       recipient: string,
@@ -279,6 +351,16 @@ export class Timelock extends Contract {
     claim(overrides?: Overrides): Promise<PopulatedTransaction>;
 
     "claim()"(overrides?: Overrides): Promise<PopulatedTransaction>;
+
+    getTimeUnlock(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "getTimeUnlock()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    getTokenAndAmount(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "getTokenAndAmount()"(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
     grantStatus(
       recipient: string,
