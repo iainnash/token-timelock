@@ -5,25 +5,28 @@ pragma solidity 0.8.6;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 /**
-    Error codes:
-    a1: Recover and recieve grant days need to be greater than 0
-    a2: Grant not valid.
-    a3: Only owner can add grants.
-    a4: Only owner can recover
-    a5: Cannot set the recovery grant before the unlock time
-    a6: Too early to recover
-    a7: Too early to claim
-    a8: Recover timestamp needs to be after receive timestamp
-    a9: Already granted
- */
-
-/**
   Timelock contract.
   Fixed token payout and timing.
   Can add recipients and multiple grants per recipient.
-  @author github.com/iainnnash
+
+  @author iain
+  github.com/iainnash/simple-timelock
  */
 contract Timelock {
+    /**
+        Error codes lookup:
+        1: Recover and recieve grant days need to be greater than 0
+        2: Grant not valid.
+        3: Only owner can add grants.
+        4: Only owner can recover
+        5: Cannot set the recovery grant before the unlock time
+        6: Too early to recover
+        7: Too early to claim
+        8: Recover timestamp needs to be after receive timestamp
+        9: Already granted
+        10: Cannot grant after unlock
+    */
+
     // Token amount to grant to each user
     uint256 private immutable tokenAmount;
     // Timestamp for when the recovery begins
@@ -42,9 +45,7 @@ contract Timelock {
         // Granted to user
         GRANTED,
         // Claimed by user
-        CLAIMED,
-        // Recovered by admin
-        RECOVERED
+        CLAIMED
     }
 
     // Mapping of address to grant
@@ -64,6 +65,9 @@ contract Timelock {
         _;
     }
 
+    /**
+        Sets up grant created by TimelockCreator Contract
+     */
     constructor(
         address _owner,
         IERC20 _token,
@@ -74,21 +78,36 @@ contract Timelock {
         token = _token;
         owner = _owner;
         tokenAmount = _tokenAmount;
-        require(unlockTimestamp > block.timestamp && recoverTimestamp > block.timestamp, "1");
+        require(
+            unlockTimestamp > block.timestamp &&
+                recoverTimestamp > block.timestamp,
+            "1"
+        );
         require(recoverTimestamp > unlockTimestamp, "8");
         timeReceiveGrant = unlockTimestamp;
         timeRecoverGrant = recoverTimestamp;
     }
 
+    /**
+        Returns token for timelock and amount per recipient
+     */
     function getTokenAndAmount() public view returns (IERC20, uint256) {
         return (token, tokenAmount);
     }
 
+    /** 
+        Returns the time users can recieve the grant / when the timelock expires
+     */
     function getTimeUnlock() public view returns (uint256) {
-        return timeRecoverGrant;
+        return timeReceiveGrant;
     }
 
-    function addGrants(address[] memory newRecipients) onlyOwner external {
+    /** 
+        @dev Adds a grant to the timelock
+        Grants can be added at any time before claim period.
+    */
+    function addGrants(address[] memory newRecipients) external onlyOwner {
+        require(getTimeUnlock() < block.timestamp, "10");
         uint256 numberRecipients = newRecipients.length;
         token.transferFrom(
             msg.sender,
@@ -102,6 +121,9 @@ contract Timelock {
         emit GrantsAdded(owner, newRecipients);
     }
 
+    /** 
+        Returns the status of the grant.
+     */
     function grantStatus(address recipient)
         external
         view
@@ -110,6 +132,9 @@ contract Timelock {
         return grants[recipient];
     }
 
+    /**
+        Allows a user to claim their grant. Claimee has to be msg.sender.
+     */
     function claim() external {
         address recipient = msg.sender;
         require(block.timestamp >= timeReceiveGrant, "7");
@@ -119,7 +144,11 @@ contract Timelock {
         emit Claimed(recipient, tokenAmount);
     }
 
-    function recover() onlyOwner external {
+    /**
+        The owner of the grant can recover after the recovery timestamp passes.
+        This sweeps remaining funds and destroys the contract data.
+     */
+    function recover() external onlyOwner {
         address payable sender = payable(msg.sender);
         require(block.timestamp >= timeRecoverGrant, "6");
         uint256 balance = token.balanceOf(address(this));
