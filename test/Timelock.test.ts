@@ -147,10 +147,11 @@ describe('TimelockTest', () => {
       });
       const lastBalance = await testToken.balanceOf(signerAddress);
       // Recovers balance from s3 token
-      await tmLock.recover(await s3.getAddress());
+      await tmLock.recover();
       expect(await testToken.balanceOf(signerAddress)).to.be.equal(
         lastBalance.add(ethers.utils.parseEther('1'))
       );
+      await expect(tmLock.getTokenAndAmount()).to.be.reverted;
     });
     describe('with a non-recoverable timelock', () => {
       let tmLock: Timelock;
@@ -171,22 +172,27 @@ describe('TimelockTest', () => {
           created.args[1]
         )) as Timelock;
       });
-      it('does not allow recovery', async () => {
+      it('does not allow recovery early', async () => {
         const [_, s2] = await ethers.getSigners();
         await testToken.mint(ethers.utils.parseEther('100'));
         await testToken.approve(tmLock.address, ethers.utils.parseEther('100'));
         await tmLock.connect(signer).addGrants([await s2.getAddress()]);
-        await expect(tmLock.recover(await s2.getAddress())).to.be.revertedWith('a6');
+        await expect(tmLock.recover()).to.be.revertedWith('a6');
         await network.provider.request({
           method: 'evm_increaseTime',
           params: [60 * 60 * 24 * 2 + 1],
         });
-        await expect(tmLock.recover(await s2.getAddress())).to.be.revertedWith('a6');
+        await expect(tmLock.recover()).to.be.revertedWith('a6');
         await network.provider.request({
           method: 'evm_increaseTime',
           params: [60 * 60 * 24 * 3 + 1],
         });
-      })
-    })
+        const lastBalance = await testToken.balanceOf(signerAddress);
+        await tmLock.recover();
+        expect(
+          (await testToken.balanceOf(signerAddress)).sub(lastBalance)
+        ).to.be.equal(ethers.utils.parseEther('1'));
+      });
+    });
   });
 });

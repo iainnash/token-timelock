@@ -27,7 +27,7 @@ interface TimelockInterface extends ethers.utils.Interface {
     "getTimeUnlock()": FunctionFragment;
     "getTokenAndAmount()": FunctionFragment;
     "grantStatus(address)": FunctionFragment;
-    "recover(address)": FunctionFragment;
+    "recover()": FunctionFragment;
     "timeReceiveGrant()": FunctionFragment;
     "timeRecoverGrant()": FunctionFragment;
   };
@@ -43,7 +43,7 @@ interface TimelockInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "grantStatus", values: [string]): string;
-  encodeFunctionData(functionFragment: "recover", values: [string]): string;
+  encodeFunctionData(functionFragment: "recover", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "timeReceiveGrant",
     values?: undefined
@@ -80,7 +80,7 @@ interface TimelockInterface extends ethers.utils.Interface {
   events: {
     "Claimed(address,uint256)": EventFragment;
     "GrantsAdded(address,address[])": EventFragment;
-    "Recovered(address,address)": EventFragment;
+    "Recovered(address,uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "Claimed"): EventFragment;
@@ -148,15 +148,9 @@ export class Timelock extends Contract {
       0: number;
     }>;
 
-    recover(
-      recipient: string,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
+    recover(overrides?: Overrides): Promise<ContractTransaction>;
 
-    "recover(address)"(
-      recipient: string,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
+    "recover()"(overrides?: Overrides): Promise<ContractTransaction>;
 
     timeReceiveGrant(overrides?: CallOverrides): Promise<{
       0: BigNumber;
@@ -210,15 +204,9 @@ export class Timelock extends Contract {
     overrides?: CallOverrides
   ): Promise<number>;
 
-  recover(
-    recipient: string,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
+  recover(overrides?: Overrides): Promise<ContractTransaction>;
 
-  "recover(address)"(
-    recipient: string,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
+  "recover()"(overrides?: Overrides): Promise<ContractTransaction>;
 
   timeReceiveGrant(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -264,12 +252,9 @@ export class Timelock extends Contract {
       overrides?: CallOverrides
     ): Promise<number>;
 
-    recover(recipient: string, overrides?: CallOverrides): Promise<void>;
+    recover(overrides?: CallOverrides): Promise<void>;
 
-    "recover(address)"(
-      recipient: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
+    "recover()"(overrides?: CallOverrides): Promise<void>;
 
     timeReceiveGrant(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -285,7 +270,7 @@ export class Timelock extends Contract {
 
     GrantsAdded(actor: null, newRecipients: null): EventFilter;
 
-    Recovered(sender: null, recipient: null): EventFilter;
+    Recovered(recipient: null, amount: null): EventFilter;
   };
 
   estimateGas: {
@@ -321,12 +306,9 @@ export class Timelock extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    recover(recipient: string, overrides?: Overrides): Promise<BigNumber>;
+    recover(overrides?: Overrides): Promise<BigNumber>;
 
-    "recover(address)"(
-      recipient: string,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
+    "recover()"(overrides?: Overrides): Promise<BigNumber>;
 
     timeReceiveGrant(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -372,15 +354,9 @@ export class Timelock extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    recover(
-      recipient: string,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
+    recover(overrides?: Overrides): Promise<PopulatedTransaction>;
 
-    "recover(address)"(
-      recipient: string,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
+    "recover()"(overrides?: Overrides): Promise<PopulatedTransaction>;
 
     timeReceiveGrant(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 

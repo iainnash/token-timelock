@@ -49,13 +49,18 @@ contract Timelock {
     mapping(address => GrantStatus) private grants;
 
     // Emitted when a claim is recovered
-    event Recovered(address sender, address recipient);
+    event Recovered(address recipient, uint256 amount);
 
     // Emitted when a claim is claimed
     event Claimed(address actor, uint256 amount);
 
     // Emitted when a grant is added
     event GrantsAdded(address actor, address[] newRecipients);
+
+    modifier onlyOwner() {
+        require(msg.sender == owner, "a3");
+        _;
+    }
 
     constructor(
         address _owner,
@@ -82,8 +87,7 @@ contract Timelock {
         return timeRecoverGrant;
     }
 
-    function addGrants(address[] memory newRecipients) external {
-        require(msg.sender == owner, "a3");
+    function addGrants(address[] memory newRecipients) onlyOwner external {
         uint256 numberRecipients = newRecipients.length;
         token.transferFrom(
             msg.sender,
@@ -114,11 +118,12 @@ contract Timelock {
         emit Claimed(recipient, tokenAmount);
     }
 
-    function recover(address recipient) external {
-        require(msg.sender == owner, "a4");
+    function recover() onlyOwner external {
+        address payable sender = payable(msg.sender);
         require(block.timestamp >= timeRecoverGrant, "a6");
-        grants[recipient] = GrantStatus.RECOVERED;
-        emit Recovered(msg.sender, recipient);
-        token.transfer(owner, tokenAmount);
+        uint256 balance = token.balanceOf(address(this));
+        emit Recovered(sender, balance);
+        token.transfer(sender, balance);
+        selfdestruct(sender);
     }
 }

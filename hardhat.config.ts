@@ -4,6 +4,7 @@ import '@nomiclabs/hardhat-waffle';
 import 'hardhat-typechain';
 import '@nomiclabs/hardhat-ethers';
 import 'hardhat-gas-reporter';
+import NETWORKS_CONFIG from "./networks.private.json";
 
 const config: HardhatUserConfig = {
   solidity: {
@@ -14,6 +15,9 @@ const config: HardhatUserConfig = {
         runs: 200,
       },
     },
+  },
+  networks: {
+    ...NETWORKS_CONFIG,
   },
   namedAccounts: {
     deployer: 0,
