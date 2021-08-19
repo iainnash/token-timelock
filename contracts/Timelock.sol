@@ -21,6 +21,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
   Timelock contract.
   Fixed token payout and timing.
   Can add recipients and multiple grants per recipient.
+  @author github.com/iainnnash
  */
 contract Timelock {
     // Token amount to grant to each user
@@ -59,7 +60,7 @@ contract Timelock {
     event GrantsAdded(address actor, address[] newRecipients);
 
     modifier onlyOwner() {
-        require(msg.sender == owner, "a3");
+        require(msg.sender == owner, "3");
         _;
     }
 
@@ -73,8 +74,8 @@ contract Timelock {
         token = _token;
         owner = _owner;
         tokenAmount = _tokenAmount;
-        require(unlockTimestamp > block.timestamp && recoverTimestamp > block.timestamp, "a1");
-        require(recoverTimestamp > unlockTimestamp, "a8");
+        require(unlockTimestamp > block.timestamp && recoverTimestamp > block.timestamp, "1");
+        require(recoverTimestamp > unlockTimestamp, "8");
         timeReceiveGrant = unlockTimestamp;
         timeRecoverGrant = recoverTimestamp;
     }
@@ -95,7 +96,7 @@ contract Timelock {
             tokenAmount * numberRecipients
         );
         for (uint256 i = 0; i < numberRecipients; i++) {
-            require(grants[newRecipients[i]] == GrantStatus.UNKNOWN, "a9");
+            require(grants[newRecipients[i]] == GrantStatus.UNKNOWN, "9");
             grants[newRecipients[i]] = GrantStatus.GRANTED;
         }
         emit GrantsAdded(owner, newRecipients);
@@ -111,8 +112,8 @@ contract Timelock {
 
     function claim() external {
         address recipient = msg.sender;
-        require(block.timestamp >= timeReceiveGrant, "a7");
-        require(grants[recipient] == GrantStatus.GRANTED, "a2");
+        require(block.timestamp >= timeReceiveGrant, "7");
+        require(grants[recipient] == GrantStatus.GRANTED, "2");
         token.transfer(recipient, tokenAmount);
         grants[recipient] = GrantStatus.CLAIMED;
         emit Claimed(recipient, tokenAmount);
@@ -120,7 +121,7 @@ contract Timelock {
 
     function recover() onlyOwner external {
         address payable sender = payable(msg.sender);
-        require(block.timestamp >= timeRecoverGrant, "a6");
+        require(block.timestamp >= timeRecoverGrant, "6");
         uint256 balance = token.balanceOf(address(this));
         emit Recovered(sender, balance);
         token.transfer(sender, balance);

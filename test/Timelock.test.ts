@@ -181,12 +181,12 @@ describe('TimelockTest', () => {
         await testToken.mint(ethers.utils.parseEther('100'));
         await testToken.approve(tmLock.address, ethers.utils.parseEther('100'));
         await tmLock.connect(signer).addGrants([await s2.getAddress()]);
-        await expect(tmLock.recover()).to.be.revertedWith('a6');
+        await expect(tmLock.recover()).to.be.revertedWith('6');
         await network.provider.request({
           method: 'evm_increaseTime',
           params: [60 * 60 * 24 * 2 + 1],
         });
-        await expect(tmLock.recover()).to.be.revertedWith('a6');
+        await expect(tmLock.recover()).to.be.revertedWith('6');
         await network.provider.request({
           method: 'evm_increaseTime',
           params: [60 * 60 * 24 * 3 + 1],
