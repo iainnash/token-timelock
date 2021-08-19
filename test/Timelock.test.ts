@@ -5,13 +5,17 @@ import { ethers, deployments, network } from 'hardhat';
 
 import { TestToken, Timelock, TimelockCreator } from '../typechain';
 
+const DAYS = 24 * 60 * 60;
+
 describe('TimelockTest', () => {
   let testToken: TestToken;
   let timelockCreator: TimelockCreator;
   let signer: SignerWithAddress;
   let signerAddress: string;
+  let now;
 
   beforeEach(async () => {
+    now = Math.floor(new Date().getTime() / 1000);
     signer = (await ethers.getSigners())[0];
     signerAddress = await signer.getAddress();
     const { TestToken: token } = await deployments.fixture('TestToken');
@@ -33,8 +37,8 @@ describe('TimelockTest', () => {
       signerAddress,
       testToken.address,
       ethers.utils.parseEther('0.01'),
-      1,
-      1
+      1 * DAYS + now,
+      2 * DAYS + now
     );
     const receipt: ContractReceipt = await txn.wait();
     const created = receipt.events.find(
@@ -70,8 +74,8 @@ describe('TimelockTest', () => {
         signerAddress,
         testToken.address,
         ethers.utils.parseEther('1'),
-        2,
-        4
+        2 * DAYS + now,
+        4 * DAYS + now
       );
       const receipt: ContractReceipt = await txn.wait();
       const created = receipt.events.find(
@@ -160,8 +164,8 @@ describe('TimelockTest', () => {
           signerAddress,
           testToken.address,
           ethers.utils.parseEther('1'),
-          2,
-          1
+          2 * DAYS + now,
+          3 * DAYS + now
         );
         const receipt: ContractReceipt = await txn.wait();
         const created = receipt.events.find(

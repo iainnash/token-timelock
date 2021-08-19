@@ -22,7 +22,7 @@ import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 
 interface TimelockCreatorInterface extends ethers.utils.Interface {
   functions: {
-    "createTimelock(address,address,uint256,uint16,uint16)": FunctionFragment;
+    "createTimelock(address,address,uint256,uint256,uint256)": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -60,17 +60,17 @@ export class TimelockCreator extends Contract {
       owner: string,
       token: string,
       payoutAmount: BigNumberish,
-      daysInFuture: BigNumberish,
-      recoveryDaysAfterGrant: BigNumberish,
+      unlockTimestamp: BigNumberish,
+      recoverTimestamp: BigNumberish,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    "createTimelock(address,address,uint256,uint16,uint16)"(
+    "createTimelock(address,address,uint256,uint256,uint256)"(
       owner: string,
       token: string,
       payoutAmount: BigNumberish,
-      daysInFuture: BigNumberish,
-      recoveryDaysAfterGrant: BigNumberish,
+      unlockTimestamp: BigNumberish,
+      recoverTimestamp: BigNumberish,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
   };
@@ -79,17 +79,17 @@ export class TimelockCreator extends Contract {
     owner: string,
     token: string,
     payoutAmount: BigNumberish,
-    daysInFuture: BigNumberish,
-    recoveryDaysAfterGrant: BigNumberish,
+    unlockTimestamp: BigNumberish,
+    recoverTimestamp: BigNumberish,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  "createTimelock(address,address,uint256,uint16,uint16)"(
+  "createTimelock(address,address,uint256,uint256,uint256)"(
     owner: string,
     token: string,
     payoutAmount: BigNumberish,
-    daysInFuture: BigNumberish,
-    recoveryDaysAfterGrant: BigNumberish,
+    unlockTimestamp: BigNumberish,
+    recoverTimestamp: BigNumberish,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
@@ -98,17 +98,17 @@ export class TimelockCreator extends Contract {
       owner: string,
       token: string,
       payoutAmount: BigNumberish,
-      daysInFuture: BigNumberish,
-      recoveryDaysAfterGrant: BigNumberish,
+      unlockTimestamp: BigNumberish,
+      recoverTimestamp: BigNumberish,
       overrides?: CallOverrides
     ): Promise<string>;
 
-    "createTimelock(address,address,uint256,uint16,uint16)"(
+    "createTimelock(address,address,uint256,uint256,uint256)"(
       owner: string,
       token: string,
       payoutAmount: BigNumberish,
-      daysInFuture: BigNumberish,
-      recoveryDaysAfterGrant: BigNumberish,
+      unlockTimestamp: BigNumberish,
+      recoverTimestamp: BigNumberish,
       overrides?: CallOverrides
     ): Promise<string>;
   };
@@ -125,17 +125,17 @@ export class TimelockCreator extends Contract {
       owner: string,
       token: string,
       payoutAmount: BigNumberish,
-      daysInFuture: BigNumberish,
-      recoveryDaysAfterGrant: BigNumberish,
+      unlockTimestamp: BigNumberish,
+      recoverTimestamp: BigNumberish,
       overrides?: Overrides
     ): Promise<BigNumber>;
 
-    "createTimelock(address,address,uint256,uint16,uint16)"(
+    "createTimelock(address,address,uint256,uint256,uint256)"(
       owner: string,
       token: string,
       payoutAmount: BigNumberish,
-      daysInFuture: BigNumberish,
-      recoveryDaysAfterGrant: BigNumberish,
+      unlockTimestamp: BigNumberish,
+      recoverTimestamp: BigNumberish,
       overrides?: Overrides
     ): Promise<BigNumber>;
   };
@@ -145,17 +145,17 @@ export class TimelockCreator extends Contract {
       owner: string,
       token: string,
       payoutAmount: BigNumberish,
-      daysInFuture: BigNumberish,
-      recoveryDaysAfterGrant: BigNumberish,
+      unlockTimestamp: BigNumberish,
+      recoverTimestamp: BigNumberish,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
-    "createTimelock(address,address,uint256,uint16,uint16)"(
+    "createTimelock(address,address,uint256,uint256,uint256)"(
       owner: string,
       token: string,
       payoutAmount: BigNumberish,
-      daysInFuture: BigNumberish,
-      recoveryDaysAfterGrant: BigNumberish,
+      unlockTimestamp: BigNumberish,
+      recoverTimestamp: BigNumberish,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
   };

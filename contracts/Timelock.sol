@@ -13,6 +13,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
     a5: Cannot set the recovery grant before the unlock time
     a6: Too early to recover
     a7: Too early to claim
+    a8: Recover timestamp needs to be after receive timestamp
     a9: Already granted
  */
 
@@ -66,17 +67,16 @@ contract Timelock {
         address _owner,
         IERC20 _token,
         uint256 _tokenAmount,
-        uint256 daysGrant,
-        uint256 daysRecover
+        uint256 unlockTimestamp,
+        uint256 recoverTimestamp
     ) {
         token = _token;
         owner = _owner;
         tokenAmount = _tokenAmount;
-        require(daysGrant > 0 && daysRecover > 0, "a1");
-        timeReceiveGrant = (uint256(daysGrant) * 1 days) + block.timestamp;
-        timeRecoverGrant =
-            (uint256(daysGrant + daysRecover) * 1 days) +
-            block.timestamp;
+        require(unlockTimestamp > block.timestamp && recoverTimestamp > block.timestamp, "a1");
+        require(recoverTimestamp > unlockTimestamp, "a8");
+        timeReceiveGrant = unlockTimestamp;
+        timeRecoverGrant = recoverTimestamp;
     }
 
     function getTokenAndAmount() public view returns (IERC20, uint256) {

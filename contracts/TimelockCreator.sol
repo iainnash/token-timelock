@@ -12,15 +12,15 @@ contract TimelockCreator {
         address owner,
         IERC20 token,
         uint256 payoutAmount,
-        uint16 daysInFuture,
-        uint16 recoveryDaysAfterGrant
+        uint256 unlockTimestamp,
+        uint256 recoverTimestamp
     ) external returns (Timelock) {
         Timelock response = new Timelock(
             owner,
             token,
             payoutAmount,
-            daysInFuture,
-            recoveryDaysAfterGrant
+            unlockTimestamp,
+            recoverTimestamp
         );
         emit CreatedTimelockContract(owner, response);
         return response;
