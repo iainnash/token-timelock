@@ -107,7 +107,8 @@ contract Timelock {
         Grants can be added at any time before claim period.
     */
     function addGrants(address[] memory newRecipients) external onlyOwner {
-        require(getTimeUnlock() < block.timestamp, "10");
+        require(getTimeUnlock() > block.timestamp, "10");
+
         uint256 numberRecipients = newRecipients.length;
         token.transferFrom(
             msg.sender,

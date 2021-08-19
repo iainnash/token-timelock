@@ -1,3 +1,5 @@
+import { HardhatRuntimeEnvironment } from "hardhat/types/runtime";
+
 module.exports = async ({ getNamedAccounts, deployments }: any) => {
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
@@ -9,3 +11,7 @@ module.exports = async ({ getNamedAccounts, deployments }: any) => {
   });
 };
 module.exports.tags = ['TestToken'];
+module.exports.skip = (hre: HardhatRuntimeEnvironment) => {
+  // @ts-ignore
+  return hre.network.live;
+}
