@@ -5,14 +5,14 @@ async function main() {
   const [signer] = await ethers.getSigners();
   const signerAddress = await signer.getAddress();
 
-  const timelockAddress = '0x0F41711C8392c6f0c94b1F25197F748b2bf4B3D6';
+  const timelockAddress = '0x37975a85d3e37f0e5580b46162e52b92ffc65dc2';
 
   const timelock = (await ethers.getContractAt(
     'Timelock',
     timelockAddress
   )) as Timelock;
 
-  if (false) {
+  if (true) {
     const withdraw = await timelock.claim();
     console.log(withdraw);
     await withdraw.wait();

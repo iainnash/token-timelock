@@ -5,7 +5,7 @@ async function main() {
   const [signer] = await ethers.getSigners();
   const signerAddress = await signer.getAddress();
 
-  const timelockAddress = '0x0F41711C8392c6f0c94b1F25197F748b2bf4B3D6';
+  const timelockAddress = '0x37975a85d3e37f0e5580b46162e52b92ffc65dc2';
 
   const timelock = (await ethers.getContractAt(
     'Timelock',
@@ -15,10 +15,12 @@ async function main() {
     'TestToken',
     '0xc778417e063141139fce010982780140aa0cd5ab'
   )) as TestToken;
-  const wethapprove = await weth.approve(timelockAddress, '100000000');
+  const wethapprove = await weth.approve(timelockAddress, '100000000000000000');
   console.log(wethapprove);
   await wethapprove.wait();
 
+//   const txn = await timelock.addGrants([signerAddress]);
+console.log('add grants');
   const txn = await timelock.addGrants([signerAddress]);
   console.log(txn);
   await txn.wait();

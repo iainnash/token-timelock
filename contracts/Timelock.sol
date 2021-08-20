@@ -3,6 +3,7 @@
 pragma solidity 0.8.6;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 
 /**
   Timelock contract.
@@ -13,6 +14,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
   github.com/iainnash/simple-timelock
  */
 contract Timelock {
+    event Transfer(address indexed from, address indexed to, uint256 tokens);
     /**
         Error codes lookup:
         1: Recover and recieve grant days need to be greater than 0
@@ -104,6 +106,34 @@ contract Timelock {
         return timeReceiveGrant;
     }
 
+    function balanceOf(address user) public view returns (uint256) {
+        return grants[user] == GrantStatus.GRANTED ? tokenAmount : 0;
+    }
+
+    function decimals() public view returns (uint8) {
+        return IERC20Metadata(address(token)).decimals();
+    }
+
+    function name() public view returns (string memory) {
+        return
+            string(
+                abi.encodePacked(
+                    "Timelocked ",
+                    IERC20Metadata(address(token)).name()
+                )
+            );
+    }
+
+    function symbol() public view returns (string memory) {
+        return
+            string(
+                abi.encodePacked(
+                    "LOCKED_",
+                    IERC20Metadata(address(token)).symbol()
+                )
+            );
+    }
+
     /** 
         @dev Adds a grant to the timelock
         Grants can be added at any time before claim period.
@@ -123,6 +153,7 @@ contract Timelock {
             tokenAmount * numberRecipients
         );
         for (uint256 i = 0; i < numberRecipients; i++) {
+            emit Transfer(address(0), newRecipients[i], tokenAmount);
             require(grants[newRecipients[i]] == GrantStatus.UNKNOWN, "9");
             grants[newRecipients[i]] = GrantStatus.GRANTED;
         }
@@ -150,6 +181,7 @@ contract Timelock {
         token.transfer(recipient, tokenAmount);
         grants[recipient] = GrantStatus.CLAIMED;
         emit Claimed(recipient, tokenAmount);
+        emit Transfer(recipient, address(0x0), tokenAmount);
     }
 
     /**

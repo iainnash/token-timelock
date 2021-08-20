@@ -19,8 +19,8 @@ async function main() {
     signerAddress,
     weth.address,
     '100000',
-    Math.floor(new Date().getTime() / 1000) + 60 * 5,
-    Math.floor(new Date().getTime() / 1000) + 60 * 10
+    Math.floor(new Date().getTime() / 1000) + 60 * 10,
+    Math.floor(new Date().getTime() / 1000) + 60 * 15
   );
   async function addGrant(newContract: string) {
     const timelock = (await ethers.getContractAt(
