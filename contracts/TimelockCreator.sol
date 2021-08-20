@@ -6,7 +6,13 @@ import "./Timelock.sol";
 Factory contract that creates a timelock given global timelock parameters.
 */
 contract TimelockCreator {
-    event CreatedTimelockContract(address indexed, Timelock);
+    event CreatedTimelockContract(
+        address indexed,
+        Timelock indexed,
+        uint256,
+        uint256,
+        uint256
+    );
 
     function createTimelock(
         address owner,
@@ -22,7 +28,13 @@ contract TimelockCreator {
             unlockTimestamp,
             recoverTimestamp
         );
-        emit CreatedTimelockContract(owner, response);
+        emit CreatedTimelockContract(
+            owner,
+            response,
+            payoutAmount,
+            unlockTimestamp,
+            recoverTimestamp
+        );
         return response;
     }
 }

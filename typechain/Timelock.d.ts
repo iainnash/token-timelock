@@ -27,6 +27,7 @@ interface TimelockInterface extends ethers.utils.Interface {
     "getTimeUnlock()": FunctionFragment;
     "getTokenAndAmount()": FunctionFragment;
     "grantStatus(address)": FunctionFragment;
+    "initialize(address,address,uint256,uint256,uint256)": FunctionFragment;
     "recover()": FunctionFragment;
     "timeReceiveGrant()": FunctionFragment;
     "timeRecoverGrant()": FunctionFragment;
@@ -43,6 +44,10 @@ interface TimelockInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "grantStatus", values: [string]): string;
+  encodeFunctionData(
+    functionFragment: "initialize",
+    values: [string, string, BigNumberish, BigNumberish, BigNumberish]
+  ): string;
   encodeFunctionData(functionFragment: "recover", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "timeReceiveGrant",
@@ -67,6 +72,7 @@ interface TimelockInterface extends ethers.utils.Interface {
     functionFragment: "grantStatus",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "recover", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "timeReceiveGrant",
@@ -148,6 +154,24 @@ export class Timelock extends Contract {
       0: number;
     }>;
 
+    initialize(
+      _owner: string,
+      _token: string,
+      _tokenAmount: BigNumberish,
+      unlockTimestamp: BigNumberish,
+      recoverTimestamp: BigNumberish,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "initialize(address,address,uint256,uint256,uint256)"(
+      _owner: string,
+      _token: string,
+      _tokenAmount: BigNumberish,
+      unlockTimestamp: BigNumberish,
+      recoverTimestamp: BigNumberish,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
     recover(overrides?: Overrides): Promise<ContractTransaction>;
 
     "recover()"(overrides?: Overrides): Promise<ContractTransaction>;
@@ -204,6 +228,24 @@ export class Timelock extends Contract {
     overrides?: CallOverrides
   ): Promise<number>;
 
+  initialize(
+    _owner: string,
+    _token: string,
+    _tokenAmount: BigNumberish,
+    unlockTimestamp: BigNumberish,
+    recoverTimestamp: BigNumberish,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "initialize(address,address,uint256,uint256,uint256)"(
+    _owner: string,
+    _token: string,
+    _tokenAmount: BigNumberish,
+    unlockTimestamp: BigNumberish,
+    recoverTimestamp: BigNumberish,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
   recover(overrides?: Overrides): Promise<ContractTransaction>;
 
   "recover()"(overrides?: Overrides): Promise<ContractTransaction>;
@@ -251,6 +293,24 @@ export class Timelock extends Contract {
       recipient: string,
       overrides?: CallOverrides
     ): Promise<number>;
+
+    initialize(
+      _owner: string,
+      _token: string,
+      _tokenAmount: BigNumberish,
+      unlockTimestamp: BigNumberish,
+      recoverTimestamp: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "initialize(address,address,uint256,uint256,uint256)"(
+      _owner: string,
+      _token: string,
+      _tokenAmount: BigNumberish,
+      unlockTimestamp: BigNumberish,
+      recoverTimestamp: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     recover(overrides?: CallOverrides): Promise<void>;
 
@@ -306,6 +366,24 @@ export class Timelock extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    initialize(
+      _owner: string,
+      _token: string,
+      _tokenAmount: BigNumberish,
+      unlockTimestamp: BigNumberish,
+      recoverTimestamp: BigNumberish,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "initialize(address,address,uint256,uint256,uint256)"(
+      _owner: string,
+      _token: string,
+      _tokenAmount: BigNumberish,
+      unlockTimestamp: BigNumberish,
+      recoverTimestamp: BigNumberish,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
     recover(overrides?: Overrides): Promise<BigNumber>;
 
     "recover()"(overrides?: Overrides): Promise<BigNumber>;
@@ -352,6 +430,24 @@ export class Timelock extends Contract {
     "grantStatus(address)"(
       recipient: string,
       overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    initialize(
+      _owner: string,
+      _token: string,
+      _tokenAmount: BigNumberish,
+      unlockTimestamp: BigNumberish,
+      recoverTimestamp: BigNumberish,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "initialize(address,address,uint256,uint256,uint256)"(
+      _owner: string,
+      _token: string,
+      _tokenAmount: BigNumberish,
+      unlockTimestamp: BigNumberish,
+      recoverTimestamp: BigNumberish,
+      overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
     recover(overrides?: Overrides): Promise<PopulatedTransaction>;

@@ -25,6 +25,8 @@ contract Timelock {
         8: Recover timestamp needs to be after receive timestamp
         9: Already granted
         10: Cannot grant after unlock
+        11: Token not approved or not enough
+        12: Invalid ownership
     */
 
     // Token amount to grant to each user
@@ -108,6 +110,11 @@ contract Timelock {
     */
     function addGrants(address[] memory newRecipients) external onlyOwner {
         require(getTimeUnlock() > block.timestamp, "10");
+        require(
+            token.allowance(msg.sender, address(this)) >=
+                newRecipients.length * tokenAmount,
+            "11"
+        );
 
         uint256 numberRecipients = newRecipients.length;
         token.transferFrom(

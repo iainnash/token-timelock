@@ -36,7 +36,7 @@ interface TimelockCreatorInterface extends ethers.utils.Interface {
   ): Result;
 
   events: {
-    "CreatedTimelockContract(address,address)": EventFragment;
+    "CreatedTimelockContract(address,address,uint256,uint256,uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "CreatedTimelockContract"): EventFragment;
@@ -116,6 +116,9 @@ export class TimelockCreator extends Contract {
   filters: {
     CreatedTimelockContract(
       undefined: string | null,
+      undefined: string | null,
+      undefined: null,
+      undefined: null,
       undefined: null
     ): EventFilter;
   };
