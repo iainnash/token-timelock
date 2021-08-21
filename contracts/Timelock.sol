@@ -14,6 +14,8 @@ import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
   github.com/iainnash/simple-timelock
  */
 contract Timelock {
+
+    // From IERC20
     event Transfer(address indexed from, address indexed to, uint256 tokens);
     /**
         Error codes lookup:
@@ -31,8 +33,6 @@ contract Timelock {
         12: Invalid ownership
     */
 
-    // Token amount to grant to each user
-    uint256 private immutable tokenAmount;
     // Timestamp for when the recovery begins
     uint256 public immutable timeRecoverGrant;
     // Timestamp for when the receive begins
@@ -42,18 +42,8 @@ contract Timelock {
     // Token to lock
     IERC20 private immutable token;
 
-    // Status of grant
-    enum GrantStatus {
-        // No grant setup for user
-        UNKNOWN,
-        // Granted to user
-        GRANTED,
-        // Claimed by user
-        CLAIMED
-    }
-
     // Mapping of address to grant
-    mapping(address => GrantStatus) private grants;
+    mapping(address => uint256) private grants;
 
     // Emitted when a claim is recovered
     event Recovered(address recipient, uint256 amount);
@@ -75,13 +65,11 @@ contract Timelock {
     constructor(
         address _owner,
         IERC20 _token,
-        uint256 _tokenAmount,
         uint256 unlockTimestamp,
         uint256 recoverTimestamp
     ) {
         token = _token;
         owner = _owner;
-        tokenAmount = _tokenAmount;
         require(
             unlockTimestamp > block.timestamp &&
                 recoverTimestamp > block.timestamp,
@@ -95,8 +83,8 @@ contract Timelock {
     /**
         Returns token for timelock and amount per recipient
      */
-    function getTokenAndAmount() public view returns (IERC20, uint256) {
-        return (token, tokenAmount);
+    function getToken() public view returns (IERC20) {
+        return token;
     }
 
     /** 
@@ -106,8 +94,22 @@ contract Timelock {
         return timeReceiveGrant;
     }
 
+    /** 
+        Returns the admin can recover unclaimed grants
+     */
+    function getTimeRecover() public view returns (uint256) {
+        return timeRecoverGrant;
+    }
+
+    /**
+        Proxied token information for bookkeeping / discoverability
+        Not implemented:
+            1. approvals
+            2. transfers
+            etc.
+    */
     function balanceOf(address user) public view returns (uint256) {
-        return grants[user] == GrantStatus.GRANTED ? tokenAmount : 0;
+        return grants[user];
     }
 
     function decimals() public view returns (uint8) {
@@ -128,7 +130,7 @@ contract Timelock {
         return
             string(
                 abi.encodePacked(
-                    "LOCKED_",
+                    "LOCK_",
                     IERC20Metadata(address(token)).symbol()
                 )
             );
@@ -138,11 +140,15 @@ contract Timelock {
         @dev Adds a grant to the timelock
         Grants can be added at any time before claim period.
     */
-    function addGrants(address[] memory newRecipients) external onlyOwner {
+    function addGrants(address[] memory newRecipients, uint256 grantSize)
+        external
+        onlyOwner
+    {
+        require(grantSize > 0, "2");
         require(getTimeUnlock() > block.timestamp, "10");
         require(
             token.allowance(msg.sender, address(this)) >=
-                newRecipients.length * tokenAmount,
+                newRecipients.length * grantSize,
             "11"
         );
 
@@ -150,12 +156,11 @@ contract Timelock {
         token.transferFrom(
             msg.sender,
             address(this),
-            tokenAmount * numberRecipients
+            grantSize * numberRecipients
         );
         for (uint256 i = 0; i < numberRecipients; i++) {
-            emit Transfer(address(0), newRecipients[i], tokenAmount);
-            require(grants[newRecipients[i]] == GrantStatus.UNKNOWN, "9");
-            grants[newRecipients[i]] = GrantStatus.GRANTED;
+            emit Transfer(address(0), newRecipients[i], grantSize);
+            grants[newRecipients[i]] += grantSize;
         }
         emit GrantsAdded(owner, newRecipients);
     }
@@ -163,11 +168,7 @@ contract Timelock {
     /** 
         Returns the status of the grant.
      */
-    function grantStatus(address recipient)
-        external
-        view
-        returns (GrantStatus)
-    {
+    function grantedAmount(address recipient) external view returns (uint256) {
         return grants[recipient];
     }
 
@@ -177,11 +178,14 @@ contract Timelock {
     function claim() external {
         address recipient = msg.sender;
         require(block.timestamp >= timeReceiveGrant, "7");
-        require(grants[recipient] == GrantStatus.GRANTED, "2");
-        token.transfer(recipient, tokenAmount);
-        grants[recipient] = GrantStatus.CLAIMED;
-        emit Claimed(recipient, tokenAmount);
-        emit Transfer(recipient, address(0x0), tokenAmount);
+        uint256 grantAmount = grants[recipient];
+        require(grantAmount > 0, "2");
+        token.transfer(recipient, grantAmount);
+        grants[recipient] = 0;
+        // Emit grant claimed event
+        emit Claimed(recipient, grantAmount);
+        // Burn tracker token
+        emit Transfer(recipient, address(0x0), grantAmount);
     }
 
     /**

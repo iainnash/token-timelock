@@ -22,13 +22,14 @@ import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 
 interface TimelockInterface extends ethers.utils.Interface {
   functions: {
-    "addGrants(address[])": FunctionFragment;
+    "addGrants(address[],uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
     "claim()": FunctionFragment;
     "decimals()": FunctionFragment;
+    "getTimeRecover()": FunctionFragment;
     "getTimeUnlock()": FunctionFragment;
-    "getTokenAndAmount()": FunctionFragment;
-    "grantStatus(address)": FunctionFragment;
+    "getToken()": FunctionFragment;
+    "grantedAmount(address)": FunctionFragment;
     "name()": FunctionFragment;
     "recover()": FunctionFragment;
     "symbol()": FunctionFragment;
@@ -36,19 +37,26 @@ interface TimelockInterface extends ethers.utils.Interface {
     "timeRecoverGrant()": FunctionFragment;
   };
 
-  encodeFunctionData(functionFragment: "addGrants", values: [string[]]): string;
+  encodeFunctionData(
+    functionFragment: "addGrants",
+    values: [string[], BigNumberish]
+  ): string;
   encodeFunctionData(functionFragment: "balanceOf", values: [string]): string;
   encodeFunctionData(functionFragment: "claim", values?: undefined): string;
   encodeFunctionData(functionFragment: "decimals", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "getTimeUnlock",
+    functionFragment: "getTimeRecover",
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "getTokenAndAmount",
+    functionFragment: "getTimeUnlock",
     values?: undefined
   ): string;
-  encodeFunctionData(functionFragment: "grantStatus", values: [string]): string;
+  encodeFunctionData(functionFragment: "getToken", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "grantedAmount",
+    values: [string]
+  ): string;
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
   encodeFunctionData(functionFragment: "recover", values?: undefined): string;
   encodeFunctionData(functionFragment: "symbol", values?: undefined): string;
@@ -66,15 +74,16 @@ interface TimelockInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "claim", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "decimals", data: BytesLike): Result;
   decodeFunctionResult(
+    functionFragment: "getTimeRecover",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "getTimeUnlock",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "getToken", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "getTokenAndAmount",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "grantStatus",
+    functionFragment: "grantedAmount",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
@@ -118,11 +127,13 @@ export class Timelock extends Contract {
   functions: {
     addGrants(
       newRecipients: string[],
+      grantSize: BigNumberish,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    "addGrants(address[])"(
+    "addGrants(address[],uint256)"(
       newRecipients: string[],
+      grantSize: BigNumberish,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
@@ -152,6 +163,14 @@ export class Timelock extends Contract {
       0: number;
     }>;
 
+    getTimeRecover(overrides?: CallOverrides): Promise<{
+      0: BigNumber;
+    }>;
+
+    "getTimeRecover()"(overrides?: CallOverrides): Promise<{
+      0: BigNumber;
+    }>;
+
     getTimeUnlock(overrides?: CallOverrides): Promise<{
       0: BigNumber;
     }>;
@@ -160,28 +179,26 @@ export class Timelock extends Contract {
       0: BigNumber;
     }>;
 
-    getTokenAndAmount(overrides?: CallOverrides): Promise<{
+    getToken(overrides?: CallOverrides): Promise<{
       0: string;
-      1: BigNumber;
     }>;
 
-    "getTokenAndAmount()"(overrides?: CallOverrides): Promise<{
+    "getToken()"(overrides?: CallOverrides): Promise<{
       0: string;
-      1: BigNumber;
     }>;
 
-    grantStatus(
+    grantedAmount(
       recipient: string,
       overrides?: CallOverrides
     ): Promise<{
-      0: number;
+      0: BigNumber;
     }>;
 
-    "grantStatus(address)"(
+    "grantedAmount(address)"(
       recipient: string,
       overrides?: CallOverrides
     ): Promise<{
-      0: number;
+      0: BigNumber;
     }>;
 
     name(overrides?: CallOverrides): Promise<{
@@ -223,11 +240,13 @@ export class Timelock extends Contract {
 
   addGrants(
     newRecipients: string[],
+    grantSize: BigNumberish,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  "addGrants(address[])"(
+  "addGrants(address[],uint256)"(
     newRecipients: string[],
+    grantSize: BigNumberish,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
@@ -246,26 +265,27 @@ export class Timelock extends Contract {
 
   "decimals()"(overrides?: CallOverrides): Promise<number>;
 
+  getTimeRecover(overrides?: CallOverrides): Promise<BigNumber>;
+
+  "getTimeRecover()"(overrides?: CallOverrides): Promise<BigNumber>;
+
   getTimeUnlock(overrides?: CallOverrides): Promise<BigNumber>;
 
   "getTimeUnlock()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-  getTokenAndAmount(overrides?: CallOverrides): Promise<{
-    0: string;
-    1: BigNumber;
-  }>;
+  getToken(overrides?: CallOverrides): Promise<string>;
 
-  "getTokenAndAmount()"(overrides?: CallOverrides): Promise<{
-    0: string;
-    1: BigNumber;
-  }>;
+  "getToken()"(overrides?: CallOverrides): Promise<string>;
 
-  grantStatus(recipient: string, overrides?: CallOverrides): Promise<number>;
-
-  "grantStatus(address)"(
+  grantedAmount(
     recipient: string,
     overrides?: CallOverrides
-  ): Promise<number>;
+  ): Promise<BigNumber>;
+
+  "grantedAmount(address)"(
+    recipient: string,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
 
   name(overrides?: CallOverrides): Promise<string>;
 
@@ -290,11 +310,13 @@ export class Timelock extends Contract {
   callStatic: {
     addGrants(
       newRecipients: string[],
+      grantSize: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "addGrants(address[])"(
+    "addGrants(address[],uint256)"(
       newRecipients: string[],
+      grantSize: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -313,26 +335,27 @@ export class Timelock extends Contract {
 
     "decimals()"(overrides?: CallOverrides): Promise<number>;
 
+    getTimeRecover(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "getTimeRecover()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     getTimeUnlock(overrides?: CallOverrides): Promise<BigNumber>;
 
     "getTimeUnlock()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    getTokenAndAmount(overrides?: CallOverrides): Promise<{
-      0: string;
-      1: BigNumber;
-    }>;
+    getToken(overrides?: CallOverrides): Promise<string>;
 
-    "getTokenAndAmount()"(overrides?: CallOverrides): Promise<{
-      0: string;
-      1: BigNumber;
-    }>;
+    "getToken()"(overrides?: CallOverrides): Promise<string>;
 
-    grantStatus(recipient: string, overrides?: CallOverrides): Promise<number>;
-
-    "grantStatus(address)"(
+    grantedAmount(
       recipient: string,
       overrides?: CallOverrides
-    ): Promise<number>;
+    ): Promise<BigNumber>;
+
+    "grantedAmount(address)"(
+      recipient: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     name(overrides?: CallOverrides): Promise<string>;
 
@@ -368,11 +391,13 @@ export class Timelock extends Contract {
   estimateGas: {
     addGrants(
       newRecipients: string[],
+      grantSize: BigNumberish,
       overrides?: Overrides
     ): Promise<BigNumber>;
 
-    "addGrants(address[])"(
+    "addGrants(address[],uint256)"(
       newRecipients: string[],
+      grantSize: BigNumberish,
       overrides?: Overrides
     ): Promise<BigNumber>;
 
@@ -391,20 +416,24 @@ export class Timelock extends Contract {
 
     "decimals()"(overrides?: CallOverrides): Promise<BigNumber>;
 
+    getTimeRecover(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "getTimeRecover()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     getTimeUnlock(overrides?: CallOverrides): Promise<BigNumber>;
 
     "getTimeUnlock()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    getTokenAndAmount(overrides?: CallOverrides): Promise<BigNumber>;
+    getToken(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "getTokenAndAmount()"(overrides?: CallOverrides): Promise<BigNumber>;
+    "getToken()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    grantStatus(
+    grantedAmount(
       recipient: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "grantStatus(address)"(
+    "grantedAmount(address)"(
       recipient: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -433,11 +462,13 @@ export class Timelock extends Contract {
   populateTransaction: {
     addGrants(
       newRecipients: string[],
+      grantSize: BigNumberish,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
-    "addGrants(address[])"(
+    "addGrants(address[],uint256)"(
       newRecipients: string[],
+      grantSize: BigNumberish,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
@@ -459,22 +490,26 @@ export class Timelock extends Contract {
 
     "decimals()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    getTimeRecover(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "getTimeRecover()"(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     getTimeUnlock(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "getTimeUnlock()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    getTokenAndAmount(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    getToken(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "getTokenAndAmount()"(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
+    "getToken()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    grantStatus(
+    grantedAmount(
       recipient: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "grantStatus(address)"(
+    "grantedAmount(address)"(
       recipient: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;

@@ -22,12 +22,12 @@ import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 
 interface TimelockCreatorInterface extends ethers.utils.Interface {
   functions: {
-    "createTimelock(address,address,uint256,uint256,uint256)": FunctionFragment;
+    "createTimelock(address,address,uint256,uint256)": FunctionFragment;
   };
 
   encodeFunctionData(
     functionFragment: "createTimelock",
-    values: [string, string, BigNumberish, BigNumberish, BigNumberish]
+    values: [string, string, BigNumberish, BigNumberish]
   ): string;
 
   decodeFunctionResult(
@@ -36,7 +36,7 @@ interface TimelockCreatorInterface extends ethers.utils.Interface {
   ): Result;
 
   events: {
-    "CreatedTimelockContract(address,address,uint256,uint256,uint256)": EventFragment;
+    "CreatedTimelockContract(address,address,address,uint256,uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "CreatedTimelockContract"): EventFragment;
@@ -59,16 +59,14 @@ export class TimelockCreator extends Contract {
     createTimelock(
       owner: string,
       token: string,
-      payoutAmount: BigNumberish,
       unlockTimestamp: BigNumberish,
       recoverTimestamp: BigNumberish,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    "createTimelock(address,address,uint256,uint256,uint256)"(
+    "createTimelock(address,address,uint256,uint256)"(
       owner: string,
       token: string,
-      payoutAmount: BigNumberish,
       unlockTimestamp: BigNumberish,
       recoverTimestamp: BigNumberish,
       overrides?: Overrides
@@ -78,16 +76,14 @@ export class TimelockCreator extends Contract {
   createTimelock(
     owner: string,
     token: string,
-    payoutAmount: BigNumberish,
     unlockTimestamp: BigNumberish,
     recoverTimestamp: BigNumberish,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  "createTimelock(address,address,uint256,uint256,uint256)"(
+  "createTimelock(address,address,uint256,uint256)"(
     owner: string,
     token: string,
-    payoutAmount: BigNumberish,
     unlockTimestamp: BigNumberish,
     recoverTimestamp: BigNumberish,
     overrides?: Overrides
@@ -97,16 +93,14 @@ export class TimelockCreator extends Contract {
     createTimelock(
       owner: string,
       token: string,
-      payoutAmount: BigNumberish,
       unlockTimestamp: BigNumberish,
       recoverTimestamp: BigNumberish,
       overrides?: CallOverrides
     ): Promise<string>;
 
-    "createTimelock(address,address,uint256,uint256,uint256)"(
+    "createTimelock(address,address,uint256,uint256)"(
       owner: string,
       token: string,
-      payoutAmount: BigNumberish,
       unlockTimestamp: BigNumberish,
       recoverTimestamp: BigNumberish,
       overrides?: CallOverrides
@@ -117,7 +111,7 @@ export class TimelockCreator extends Contract {
     CreatedTimelockContract(
       undefined: string | null,
       undefined: string | null,
-      undefined: null,
+      undefined: string | null,
       undefined: null,
       undefined: null
     ): EventFilter;
@@ -127,16 +121,14 @@ export class TimelockCreator extends Contract {
     createTimelock(
       owner: string,
       token: string,
-      payoutAmount: BigNumberish,
       unlockTimestamp: BigNumberish,
       recoverTimestamp: BigNumberish,
       overrides?: Overrides
     ): Promise<BigNumber>;
 
-    "createTimelock(address,address,uint256,uint256,uint256)"(
+    "createTimelock(address,address,uint256,uint256)"(
       owner: string,
       token: string,
-      payoutAmount: BigNumberish,
       unlockTimestamp: BigNumberish,
       recoverTimestamp: BigNumberish,
       overrides?: Overrides
@@ -147,16 +139,14 @@ export class TimelockCreator extends Contract {
     createTimelock(
       owner: string,
       token: string,
-      payoutAmount: BigNumberish,
       unlockTimestamp: BigNumberish,
       recoverTimestamp: BigNumberish,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
-    "createTimelock(address,address,uint256,uint256,uint256)"(
+    "createTimelock(address,address,uint256,uint256)"(
       owner: string,
       token: string,
-      payoutAmount: BigNumberish,
       unlockTimestamp: BigNumberish,
       recoverTimestamp: BigNumberish,
       overrides?: Overrides
