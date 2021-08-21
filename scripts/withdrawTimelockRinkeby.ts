@@ -2,9 +2,6 @@ import { ethers, network, deployments } from 'hardhat';
 import { TestToken, Timelock, TimelockCreator } from '../typechain';
 
 async function main() {
-  const [signer] = await ethers.getSigners();
-  const signerAddress = await signer.getAddress();
-
   const timelockAddress = '0x37975a85d3e37f0e5580b46162e52b92ffc65dc2';
 
   const timelock = (await ethers.getContractAt(

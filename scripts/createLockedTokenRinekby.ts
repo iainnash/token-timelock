@@ -18,16 +18,15 @@ async function main() {
   const txn = await timelock.createTimelock(
     signerAddress,
     weth.address,
-    '100000',
-    Math.floor(new Date().getTime() / 1000) + 60 * 10,
-    Math.floor(new Date().getTime() / 1000) + 60 * 15
+    Math.floor(new Date().getTime() / 1000) + 60 * 6,
+    Math.floor(new Date().getTime() / 1000) + 60 * 12 
   );
   async function addGrant(newContract: string) {
     const timelock = (await ethers.getContractAt(
       'Timelock',
       newContract
     )) as Timelock;
-    const txn = await timelock.addGrants([signerAddress]);
+    const txn = await timelock.addGrants([signerAddress], '100000');
     console.log(txn);
     await txn.wait();
     return txn.hash;

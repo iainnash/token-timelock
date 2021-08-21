@@ -26,6 +26,7 @@ interface TimelockInterface extends ethers.utils.Interface {
     "balanceOf(address)": FunctionFragment;
     "claim()": FunctionFragment;
     "decimals()": FunctionFragment;
+    "getOwner()": FunctionFragment;
     "getTimeRecover()": FunctionFragment;
     "getTimeUnlock()": FunctionFragment;
     "getToken()": FunctionFragment;
@@ -33,8 +34,7 @@ interface TimelockInterface extends ethers.utils.Interface {
     "name()": FunctionFragment;
     "recover()": FunctionFragment;
     "symbol()": FunctionFragment;
-    "timeReceiveGrant()": FunctionFragment;
-    "timeRecoverGrant()": FunctionFragment;
+    "totalSupply()": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -44,6 +44,7 @@ interface TimelockInterface extends ethers.utils.Interface {
   encodeFunctionData(functionFragment: "balanceOf", values: [string]): string;
   encodeFunctionData(functionFragment: "claim", values?: undefined): string;
   encodeFunctionData(functionFragment: "decimals", values?: undefined): string;
+  encodeFunctionData(functionFragment: "getOwner", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "getTimeRecover",
     values?: undefined
@@ -61,11 +62,7 @@ interface TimelockInterface extends ethers.utils.Interface {
   encodeFunctionData(functionFragment: "recover", values?: undefined): string;
   encodeFunctionData(functionFragment: "symbol", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "timeReceiveGrant",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "timeRecoverGrant",
+    functionFragment: "totalSupply",
     values?: undefined
   ): string;
 
@@ -73,6 +70,7 @@ interface TimelockInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "claim", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "decimals", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "getOwner", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getTimeRecover",
     data: BytesLike
@@ -90,11 +88,7 @@ interface TimelockInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "recover", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "symbol", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "timeReceiveGrant",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "timeRecoverGrant",
+    functionFragment: "totalSupply",
     data: BytesLike
   ): Result;
 
@@ -163,6 +157,14 @@ export class Timelock extends Contract {
       0: number;
     }>;
 
+    getOwner(overrides?: CallOverrides): Promise<{
+      0: string;
+    }>;
+
+    "getOwner()"(overrides?: CallOverrides): Promise<{
+      0: string;
+    }>;
+
     getTimeRecover(overrides?: CallOverrides): Promise<{
       0: BigNumber;
     }>;
@@ -221,19 +223,11 @@ export class Timelock extends Contract {
       0: string;
     }>;
 
-    timeReceiveGrant(overrides?: CallOverrides): Promise<{
+    totalSupply(overrides?: CallOverrides): Promise<{
       0: BigNumber;
     }>;
 
-    "timeReceiveGrant()"(overrides?: CallOverrides): Promise<{
-      0: BigNumber;
-    }>;
-
-    timeRecoverGrant(overrides?: CallOverrides): Promise<{
-      0: BigNumber;
-    }>;
-
-    "timeRecoverGrant()"(overrides?: CallOverrides): Promise<{
+    "totalSupply()"(overrides?: CallOverrides): Promise<{
       0: BigNumber;
     }>;
   };
@@ -264,6 +258,10 @@ export class Timelock extends Contract {
   decimals(overrides?: CallOverrides): Promise<number>;
 
   "decimals()"(overrides?: CallOverrides): Promise<number>;
+
+  getOwner(overrides?: CallOverrides): Promise<string>;
+
+  "getOwner()"(overrides?: CallOverrides): Promise<string>;
 
   getTimeRecover(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -299,13 +297,9 @@ export class Timelock extends Contract {
 
   "symbol()"(overrides?: CallOverrides): Promise<string>;
 
-  timeReceiveGrant(overrides?: CallOverrides): Promise<BigNumber>;
+  totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
 
-  "timeReceiveGrant()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-  timeRecoverGrant(overrides?: CallOverrides): Promise<BigNumber>;
-
-  "timeRecoverGrant()"(overrides?: CallOverrides): Promise<BigNumber>;
+  "totalSupply()"(overrides?: CallOverrides): Promise<BigNumber>;
 
   callStatic: {
     addGrants(
@@ -334,6 +328,10 @@ export class Timelock extends Contract {
     decimals(overrides?: CallOverrides): Promise<number>;
 
     "decimals()"(overrides?: CallOverrides): Promise<number>;
+
+    getOwner(overrides?: CallOverrides): Promise<string>;
+
+    "getOwner()"(overrides?: CallOverrides): Promise<string>;
 
     getTimeRecover(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -369,13 +367,9 @@ export class Timelock extends Contract {
 
     "symbol()"(overrides?: CallOverrides): Promise<string>;
 
-    timeReceiveGrant(overrides?: CallOverrides): Promise<BigNumber>;
+    totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "timeReceiveGrant()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    timeRecoverGrant(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "timeRecoverGrant()"(overrides?: CallOverrides): Promise<BigNumber>;
+    "totalSupply()"(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   filters: {
@@ -416,6 +410,10 @@ export class Timelock extends Contract {
 
     "decimals()"(overrides?: CallOverrides): Promise<BigNumber>;
 
+    getOwner(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "getOwner()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     getTimeRecover(overrides?: CallOverrides): Promise<BigNumber>;
 
     "getTimeRecover()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -450,13 +448,9 @@ export class Timelock extends Contract {
 
     "symbol()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    timeReceiveGrant(overrides?: CallOverrides): Promise<BigNumber>;
+    totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "timeReceiveGrant()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    timeRecoverGrant(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "timeRecoverGrant()"(overrides?: CallOverrides): Promise<BigNumber>;
+    "totalSupply()"(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
@@ -489,6 +483,10 @@ export class Timelock extends Contract {
     decimals(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "decimals()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    getOwner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "getOwner()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     getTimeRecover(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
@@ -526,16 +524,8 @@ export class Timelock extends Contract {
 
     "symbol()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    timeReceiveGrant(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    totalSupply(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "timeReceiveGrant()"(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    timeRecoverGrant(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "timeRecoverGrant()"(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
+    "totalSupply()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
   };
 }

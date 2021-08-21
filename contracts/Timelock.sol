@@ -14,7 +14,6 @@ import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
   github.com/iainnash/simple-timelock
  */
 contract Timelock {
-
     // From IERC20
     event Transfer(address indexed from, address indexed to, uint256 tokens);
     /**
@@ -34,9 +33,9 @@ contract Timelock {
     */
 
     // Timestamp for when the recovery begins
-    uint256 public immutable timeRecoverGrant;
+    uint256 private immutable timeRecoverGrant;
     // Timestamp for when the receive begins
-    uint256 public immutable timeReceiveGrant;
+    uint256 private immutable timeReceiveGrant;
     // Owner that can recover grant and add new grant addresses
     address private immutable owner;
     // Token to lock
@@ -87,6 +86,10 @@ contract Timelock {
         return token;
     }
 
+    function getOwner() public view returns (address) {
+        return owner;
+    }
+
     /** 
         Returns the time users can recieve the grant / when the timelock expires
      */
@@ -110,6 +113,10 @@ contract Timelock {
     */
     function balanceOf(address user) public view returns (uint256) {
         return grants[user];
+    }
+
+    function totalSupply() public view returns (uint256) {
+        return token.balanceOf(address(this));
     }
 
     function decimals() public view returns (uint8) {
