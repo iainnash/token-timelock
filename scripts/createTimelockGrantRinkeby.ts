@@ -1,12 +1,14 @@
-import { ethers, network, deployments } from 'hardhat';
+import { ethers, network, deployments, getNamedAccounts } from 'hardhat';
 import { TestToken, Timelock, TimelockCreator } from '../typechain';
 
 async function main() {
-  const [signer] = await ethers.getSigners();
-  const signerAddress = await signer.getAddress();
+  // const [signer] = await ethers.getSigners();
+  // const signerAddress = await signer.getAddress();
 
-  const timelockAddress = '0x37975a85d3e37f0e5580b46162e52b92ffc65dc2';
+  const { signer } = await getNamedAccounts();
+  const deployer = signer; 
 
+  const timelockAddress = (await deployments.get('Timelock')).address;
   const timelock = (await ethers.getContractAt(
     'Timelock',
     timelockAddress
@@ -19,11 +21,14 @@ async function main() {
   console.log(wethapprove);
   await wethapprove.wait();
 
-//   const txn = await timelock.addGrants([signerAddress]);
-console.log('add grants');
-  const txn = await timelock.addGrants([signerAddress]);
+  //   const txn = await timelock.addGrants([signerAddress]);
+  console.log('add grants');
+  const txn = await timelock.addGrants([deployer], '10000');
   console.log(txn);
   await txn.wait();
+  const txn2 = await timelock.addGrants([deployer], '5000');
+  await txn2.wait();
+  console.log('grant2');
 
   const withdraw = await timelock.claim();
   console.log(withdraw);

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0
+
 pragma solidity 0.8.6;
 
 import "./Timelock.sol";
@@ -9,7 +11,7 @@ contract TimelockCreator {
     event CreatedTimelockContract(
         address indexed,
         Timelock indexed,
-        uint256,
+        IERC20 indexed,
         uint256,
         uint256
     );
@@ -17,21 +19,19 @@ contract TimelockCreator {
     function createTimelock(
         address owner,
         IERC20 token,
-        uint256 payoutAmount,
         uint256 unlockTimestamp,
         uint256 recoverTimestamp
     ) external returns (Timelock) {
         Timelock response = new Timelock(
             owner,
             token,
-            payoutAmount,
             unlockTimestamp,
             recoverTimestamp
         );
         emit CreatedTimelockContract(
             owner,
             response,
-            payoutAmount,
+            token,
             unlockTimestamp,
             recoverTimestamp
         );
