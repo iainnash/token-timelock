@@ -3,13 +3,13 @@ module.exports = async ({ getNamedAccounts, deployments }: any) => {
   const { signer, deployer } = await getNamedAccounts();
 
   const args = [
-    '0x9444390c01Dd5b7249E53FAc31290F7dFF53450D',
-    '0xc778417e063141139fce010982780140aa0cd5ab',
-    Math.floor(new Date().getTime() / 1000) + 60 * 6,
-    Math.floor(new Date().getTime() / 1000) + 60 * 12,
+    '0x87EE1158bEe297c381745284dcb2E54fA03EB5f2',
+    '0x47E1b433Ca6F3f87302fACE00484BaE025b6b31C',
+    1640408400,
+    1653796800,
   ];
 
-  console.log(args);
+  console.log({args});
 
   await deploy('Timelock', {
     from: deployer,
